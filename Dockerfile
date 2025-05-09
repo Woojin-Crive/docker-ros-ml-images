@@ -26,9 +26,10 @@ FROM --platform=arm64 ubuntu:24.04 AS base-ubuntu24.04-arm64
 
 # === cuda base images ============================================================================
 FROM --platform=amd64 nvcr.io/nvidia/cuda:12.6.1-runtime-ubuntu22.04 AS base-cuda-ubuntu22.04-amd64
-FROM --platform=amd64 nvcr.io/nvidia/cuda:12.6.1-runtime-ubuntu24.04 AS base-cuda-ubuntu24.04-amd64
+FROM --platform=amd64 nvcr.io/nvidia/cuda:12.8.0-devel-ubuntu24.04 AS base-cuda-ubuntu24.04-amd64
 
 FROM --platform=arm64 nvcr.io/nvidia/l4t-cuda:12.6.11-runtime AS base-cuda-ubuntu22.04-arm64
+FROM --platform=arm64 dustynv/pytorch:2.7-r36.4.0-cu128-24.04 AS base-cuda-ubuntu24.04-arm64
 # no l4t-cuda image for ubuntu24 available
 
 # === tensorrt base images ========================================================================
@@ -225,25 +226,26 @@ ARG TORCH_VERSION
 RUN if [[ -n $TORCH_VERSION ]]; then \
         if [[ "$TARGETARCH" == "amd64" ]]; then \
             # --ignore-installed, because of dependency conflicts
-            pip3 install --ignore-installed torch==${TORCH_VERSION} && \
+            pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128 && \
             if [[ "$TORCH_VERSION" == "2.5.0" ]]; then pip3 install torchvision==0.20.0; fi; \
-        elif [[ "$TARGETARCH" == "arm64" ]]; then \
-            # from: https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048
-            # and: https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform/index.html#prereqs-install
-            apt-get update && \
-            apt-get install -y libopenblas-base libopenmpi-dev libomp-dev && \
-            rm -rf /var/lib/apt/lists/* && \
-            wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/${TARGETARCH}/cuda-keyring_1.1-1_all.deb && \
-            dpkg -i cuda-keyring_1.1-1_all.deb && \
-            apt-get update && \
-            apt-get install -y libcusparselt0 libcusparselt-dev cuda-cupti-12-6 && \
-            rm -rf /var/lib/apt/lists/* && \
-            wget -q -O /tmp/torch-${TORCH_VERSION}a0+872d972e41.nv24.08.17622132-cp310-cp310-linux_aarch64.whl https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/torch-${TORCH_VERSION}a0+872d972e41.nv24.08.17622132-cp310-cp310-linux_aarch64.whl && \
-            wget -q -O /tmp/torchvision-0.20.0-cp310-cp310-linux_aarch64.whl http://jetson.webredirect.org/jp6/cu126/+f/5f9/67f920de3953f/torchvision-0.20.0-cp310-cp310-linux_aarch64.whl && \
-            python3 -m pip install numpy=="1.26.1" && \
-            python3 -m pip install --ignore-installed --no-cache /tmp/torch*.whl && \
-            rm -f /tmp/torch*.whl; \
-        fi; \
+        # Using Pytorch preinstalled image for arm64
+        # elif [[ "$TARGETARCH" == "arm64" ]]; then \
+        #     # from: https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048
+        #     # and: https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform/index.html#prereqs-install
+        #     apt-get update && \
+        #     apt-get install -y libopenblas-base libopenmpi-dev libomp-dev && \
+        #     rm -rf /var/lib/apt/lists/* && \
+        #     wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/${TARGETARCH}/cuda-keyring_1.1-1_all.deb && \
+        #     dpkg -i cuda-keyring_1.1-1_all.deb && \
+        #     apt-get update && \
+        #     apt-get install -y libcusparselt0 libcusparselt-dev cuda-cupti-12-6 && \
+        #     rm -rf /var/lib/apt/lists/* && \
+        #     wget -q -O /tmp/torch-${TORCH_VERSION}a0+872d972e41.nv24.08.17622132-cp310-cp310-linux_aarch64.whl https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/torch-${TORCH_VERSION}a0+872d972e41.nv24.08.17622132-cp310-cp310-linux_aarch64.whl && \
+        #     wget -q -O /tmp/torchvision-0.20.0-cp310-cp310-linux_aarch64.whl http://jetson.webredirect.org/jp6/cu126/+f/5f9/67f920de3953f/torchvision-0.20.0-cp310-cp310-linux_aarch64.whl && \
+        #     python3 -m pip install numpy=="1.26.1" && \
+        #     python3 -m pip install --ignore-installed --no-cache /tmp/torch*.whl && \
+        #     rm -f /tmp/torch*.whl; \
+        # fi; \
     fi
 
 # install TensorFlow
