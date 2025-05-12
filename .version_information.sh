@@ -12,7 +12,7 @@ if [[ -z "$ROS_DOMAIN_ID" ]]; then
 fi
 
 if [[ -z "$RMW_IMPLEMENTATION" ]]; then
-  if ros2 pkg list | grep -q "rmw_fastrtps_cpp"; then
+  if ros2 pkg list | cat | grep -q "rmw_fastrtps_cpp"; then
     export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
   fi
 fi
