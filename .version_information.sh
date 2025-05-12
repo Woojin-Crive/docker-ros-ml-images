@@ -8,7 +8,7 @@ ARCH=$(uname -m)
 [[ -f /etc/nv_tegra_release ]] && JETSON_LINUX_VERSION=$(cat /etc/nv_tegra_release | head -n 1 | sed 's/ (release), REVISION: /./g' | awk '{print $2}' | grep -oE '[0-9.]+')
 
 if [[ -z "$RMW_IMPLEMENTATION" && $ROS_DISTRO != "noetic" ]]; then
-  if ros2 pkg list | grep -q "rmw_fastrtps_cpp"; then
+  if ros2 pkg list | cat | grep -q "rmw_fastrtps_cpp"; then
     export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
   fi
 fi
