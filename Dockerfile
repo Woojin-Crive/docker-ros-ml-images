@@ -246,7 +246,7 @@ RUN if [[ -n $TORCH_VERSION ]]; then \
         #     python3 -m pip install --ignore-installed --no-cache /tmp/torch*.whl && \
         #     rm -f /tmp/torch*.whl; \
         # fi; \
-    fi
+    fi;
 
 # install TensorFlow
 ARG TF_VERSION
