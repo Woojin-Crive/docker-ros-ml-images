@@ -263,8 +263,8 @@ ENV DOCKER_GID=
 RUN if id -u 1000 >/dev/null 2>&1; then userdel --force --remove $(getent passwd 1000 | cut -d: -f1); fi
 
 # print version information during login
-RUN echo "source /.version_information.sh" >> ~/.bashrc
-COPY .version_information.sh /.version_information.sh
+# RUN echo "source /.version_information.sh" >> ~/.bashrc
+# COPY .version_information.sh /.version_information.sh
 
 # container startup setup
 ENV WORKSPACE=/docker-ros/ws

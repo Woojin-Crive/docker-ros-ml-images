@@ -1,11 +1,11 @@
-PLATFORM="amd64"
+PLATFORM="linux/amd64,linux/arm64"
 BASE_IMAGE_TYPE="-cuda"
 UBUNTU_VERSION="24.04"
 ROS_VERSION="2"
 ROS_DISTRO="jazzy"
 ROS_PACKAGE="ros-base"
 TORCH_VERSION="2.7.0"
-IMAGE="robotis/ros:jazzy-base-torch2.7.0-cuda12.8.0"
+IMAGE="robotis/ros:jazzy-ros-base-torch2.7.0-cuda12.8.0"
 
 docker buildx build \
   --pull \
